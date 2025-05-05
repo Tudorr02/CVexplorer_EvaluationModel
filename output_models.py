@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel
+from typing import List, Optional
+from pydantic import BaseModel, Field
 from models import PositionLevel, EducationLevel
 
 class SkillsResult(BaseModel):
@@ -23,7 +23,7 @@ class EducationResult(BaseModel):
     score: float
 
 class CVEvaluationResultDTO(BaseModel):
-    candidateName: str                       # JSON will be camelCase
+    candidateName: Optional[str] = Field(default=None, description="Numele extras sau None dacă nu s-a găsit")                     # JSON will be camelCase
     requiredSkills:          SkillsResult
     niceToHave:              SkillsResult
     languages:               LanguagesResult

@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field , constr
 
 class PositionLevel(str, Enum):
     intern = "Intern"
@@ -28,4 +28,8 @@ class PositionDTO(BaseModel):
 
 class CvEvaluationRequest(BaseModel):
     cv_text: str = Field(..., description="The CV text input")
+    position: PositionDTO
+
+class BulkCvEvaluationRequest(BaseModel):
+    cvTexts: List[str] = Field(..., description="Lista de CV‑uri brute (plain‑text)")
     position: PositionDTO
