@@ -3,15 +3,14 @@ from fastapi import FastAPI, HTTPException
 from models import CvEvaluationRequest , BulkCvEvaluationRequest
 from output_models import CVEvaluationResultDTO
 from services import Evaluator
+# import services
 # from services import  evaluate, evaluate_bulk
 
 # Configuration
 API_KEYS = [
-    "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",
-    "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",
-    "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"
+    
 ]
-MODEL_NAME = "meta-llama/llama-4-scout-17b-16e-instruct"
+MODEL_NAME = "gemma2-9b-it"
 MAX_COMPLETION_TOKENS = 1024
 
 # Instantiate the Evaluator
@@ -20,9 +19,6 @@ evaluator = Evaluator(
     model=MODEL_NAME,
     max_completion_tokens=MAX_COMPLETION_TOKENS,
 )
-
-
-
 
 app = FastAPI(title="Cv Analyzer API")
 
@@ -36,6 +32,7 @@ async def evaluate_cv(request: CvEvaluationRequest)-> CVEvaluationResultDTO:
     # evaluation_result = evaluate(request.cv_text, request.position)
     # return evaluation_result
     result : CVEvaluationResultDTO = evaluator.evaluate(request.cv_text, request.position)
+
     return result
 
 @app.post("/evaluate-cvs",response_model=List[CVEvaluationResultDTO])
@@ -51,4 +48,8 @@ async def evaluate_cvs(requests: BulkCvEvaluationRequest) -> List[CVEvaluationRe
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
+
+
+
+
