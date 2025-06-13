@@ -3,17 +3,14 @@ from fastapi import FastAPI, HTTPException
 from models import CvEvaluationRequest , BulkCvEvaluationRequest
 from output_models import CVEvaluationResultDTO
 from services import Evaluator
-# import services
-# from services import  evaluate, evaluate_bulk
+import os
 
-# Configuration
-API_KEYS = [
-    
-]
+env_var_names = ["GROQ_API_KEY_1","GROQ_API_KEY_2"]
+API_KEYS = [os.getenv(name) for name in env_var_names if os.getenv(name)]
+
 MODEL_NAME = "gemma2-9b-it"
 MAX_COMPLETION_TOKENS = 1024
 
-# Instantiate the Evaluator
 evaluator = Evaluator(
     api_keys=API_KEYS,
     model=MODEL_NAME,
@@ -24,13 +21,10 @@ app = FastAPI(title="Cv Analyzer API")
 
 @app.post("/evaluate-cv",response_model=CVEvaluationResultDTO)
 async def evaluate_cv(request: CvEvaluationRequest)-> CVEvaluationResultDTO:
-    # Validate input
+
     if not request.cv_text or not request.position:
         raise HTTPException(status_code=400, detail="Both cv_text and position must be provided.")
     
-    # Call the Cv analysis function from services.py
-    # evaluation_result = evaluate(request.cv_text, request.position)
-    # return evaluation_result
     result : CVEvaluationResultDTO = evaluator.evaluate(request.cv_text, request.position)
 
     return result
@@ -39,9 +33,7 @@ async def evaluate_cv(request: CvEvaluationRequest)-> CVEvaluationResultDTO:
 async def evaluate_cvs(requests: BulkCvEvaluationRequest) -> List[CVEvaluationResultDTO]:
     if not requests.cvTexts or not requests.position:
         raise HTTPException(status_code=400, detail="Both cv_text and position must be provided.")
-    
-    # evaluation_results = await evaluate_bulk(requests.cvTexts, requests.position)
-    # return evaluation_results
+
     results: List[CVEvaluationResultDTO] = await evaluator.evaluate_bulk(requests.cvTexts, requests.position)
     return results
 
