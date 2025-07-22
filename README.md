@@ -50,7 +50,7 @@ python main.py
 ### ```POST /evaluate-cv```
 > Evaluate a single CV against a position.
 
-#### Request Body ( example )
+#### 📥 Request Body ( example )
 
 ```
 {
@@ -77,7 +77,7 @@ python main.py
 ### ```POST /evaluate-cvs```
 > Evaluate multiple CVs in bulk against a position
 
-#### Request Body ( example )
+#### 📥 Request Body ( example )
 
 ```
 {
@@ -115,7 +115,7 @@ For each CV, a dedicated **_worker** is defined which performs:
     - All workers are launched concurrently using
    ``` await asyncio.gather(*tasks) ```<br></br>
 
-#### Sample Response ( example )
+#### 📤 Sample Response ( example )
 Example response returned by either of the endpoints:
 ```
 {
