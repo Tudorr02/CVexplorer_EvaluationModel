@@ -68,6 +68,11 @@ python main.py
   }
 }
 ```
+#### 🛠️```evaluate```
+- **Synchronous method**
+- Evaluates a single CV using the first available **API key**.
+- Internally calls **_sync_worker**.
+- Directly returns the result as a **CVEvaluationResultDTO**. <br></br>
 
 ### ```POST /evaluate-cvs```
 > Evaluate multiple CVs in bulk against a position
@@ -80,6 +85,35 @@ python main.py
   "position": { ... same as above ... }
 }
 ```
+#### 🛠️```evaluate_bulk```
+- **Asynchronous method**
+- Processes a **list of CVs concurrently**, comparing each to the provided position..
+- Internally calls **_sync_worker**.
+- Distributes API calls across **multiple API keys using a round-robin strategy**, while respecting **rate limiting per key**.
+
+#### 🔹 Async Mechanism
+
+For each CV, a dedicated **_worker** is defined which performs:
+
+1. **Fetch an API key** from the queue.
+
+2. **Check token availability for the key:**
+   - If the token consumption is **within the limit**, proceed.
+   - If the limit is **exceeded**, the worker **waits for the token window to reset** before proceeding (**rate limiting logic**).
+
+3. **Evaluation Attempts (Retries):**
+   - The evaluation is attempted **up to 3 times per CV**.
+   - On **RateLimitError**, it waits **10 seconds** and retries.
+   - On **any other exception**, it also waits **10 seconds** before retrying.
+
+4. **Upon Success:**
+   - **Updates** the token count consumed on the current API key.
+   - **Returns the API key to the queue** for the next worker.
+   - **Saves the evaluation result** in the corresponding index of the results list.
+    
+5. **Concurrent Execution**:
+    - All workers are launched concurrently using
+   ``` await asyncio.gather(*tasks) ```<br></br>
 
 #### Sample Response ( example )
 Example response returned by either of the endpoints:
